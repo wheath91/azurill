@@ -1,6 +1,7 @@
 # Azurill
 ## Set your AWS environmental variables based off your stored profile name
 Parameters:
+
 -p : Named AWS profile as it appears in your credentials file, i.e. js-dpp1
 -v : Named variable to retrieve from AWS profile for when you only want to set one variable (optional)
 
