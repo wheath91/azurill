@@ -77,26 +77,27 @@ then
 		echo "AWS credentials not found"
 		help
 	fi
+        echo "Please copy/paste and execute the generated export commands"
 	for line in $(cat "${AWS_CREDENTIALS_FILE}/credentials")
 	do
 		if [[ "${line}" = "[${AZURILL_PROFILE}]" ]]
 		then
-			echo "Identified profile ${AZURILL_PROFILE}"			
-			export AWS_PROFILE=${AZURILL_PROFILE}
+			echo "export AWS_PROFILE=${AZURILL_PROFILE}"			
+			#export AWS_PROFILE=${AZURILL_PROFILE}
 		        desired_profile=1
 		elif [[ "${line}" =~ \[*\] ]]
                 then
 			desired_profile=0
 		elif [[ ${desired_profile} -eq 1 ]]
 		then
-			#echo "$line"
 			key=$(sed 's/=.*$//g' <<< $line)
 			val=$(sed 's/^[^=]*=//g' <<< $line)
 			export_key=$(tr '[:lower:]' '[:upper:]' <<< $key)
 			if [[ -z "${AZURILL_VARIABLE}" ]] || [[ "${AZURILL_VARIABLE}" = "${key}" ]] || [[ "${AZURILL_VARIABLE}" = "${export_key}" ]]
 			then
-			    echo -e "Setting ${key}"
-			    export ${export_key}=${val}
+			    #echo "Setting ${key}"
+			    echo "export ${export_key}=${val}"
+			    #export ${export_key}=${val} - this doesn't work the way you'd want it to. Environmental variables are lost to the sub shell.
 			fi
 		fi
 	done
