@@ -41,12 +41,20 @@ AWS_CREDENTIALS_FILE=$(cd ~/.aws && pwd)
 AZURILL_PROFILE=""
 AZURILL_VARIABLE=""
 
+# A slightly ropey hack needed due to the way getopts interacts with the source
+# command in Bash.
+# https://stackoverflow.com/questions/23581368/bug-in-parsing-args-with-getopts-in-bash
+OPTIND=1
+
 function help {
 	echo "Usage: Azurill will fetch and set the appropriate environmental AWS variables"
         echo "       from your aws-azure-login credentials file"
         echo ""
-        echo "-p : Named AWS profile, i.e. js-dpp1"
-        echo "-v : Named variable to retrieve from AWS profile (optional)"
+        echo "  -p : Named AWS profile, i.e. js-dpp1"
+        echo "  -v : Named variable to retrieve from AWS profile (optional)"
+        echo ""
+        echo " Note: This script should be sourced in order to set the parent shell's"
+        echo " environmental variables."
 }
 
 while getopts "p:v:" opt; do
@@ -77,13 +85,11 @@ then
 		echo "AWS credentials not found"
 		help
 	fi
-        echo "Please copy/paste and execute the generated export commands"
 	for line in $(cat "${AWS_CREDENTIALS_FILE}/credentials")
 	do
 		if [[ "${line}" = "[${AZURILL_PROFILE}]" ]]
 		then
-			echo "export AWS_PROFILE=${AZURILL_PROFILE}"			
-			#export AWS_PROFILE=${AZURILL_PROFILE}
+			export AWS_PROFILE"=${AZURILL_PROFILE}"
 		        desired_profile=1
 		elif [[ "${line}" =~ \[*\] ]]
                 then
@@ -95,9 +101,8 @@ then
 			export_key=$(tr '[:lower:]' '[:upper:]' <<< $key)
 			if [[ -z "${AZURILL_VARIABLE}" ]] || [[ "${AZURILL_VARIABLE}" = "${key}" ]] || [[ "${AZURILL_VARIABLE}" = "${export_key}" ]]
 			then
-			    #echo "Setting ${key}"
-			    echo "export ${export_key}=${val}"
-			    #export ${export_key}=${val} - this doesn't work the way you'd want it to. Environmental variables are lost to the sub shell.
+			    echo "Setting ${key}"
+			    export ${export_key}"=${val}"
 			fi
 		fi
 	done
