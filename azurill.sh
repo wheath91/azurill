@@ -89,7 +89,8 @@ then
 	do
 		if [[ "${line}" = "[${AZURILL_PROFILE}]" ]]
 		then
-			export AWS_PROFILE"=${AZURILL_PROFILE}"
+			echo "Setting AWS_PROFILE"
+		        export AWS_PROFILE"=${AZURILL_PROFILE}"
 		        desired_profile=1
 		elif [[ "${line}" =~ \[*\] ]]
                 then
